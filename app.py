@@ -58,6 +58,7 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
     # モデルロード #############################################################
+    # Model loading ###############################################################
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(
         static_image_mode=use_static_image_mode,
@@ -66,12 +67,12 @@ def main():
         min_tracking_confidence=min_tracking_confidence,
     )
 
-    keypoint_classifier = KeyPointClassifier()
+    keypoint_classifier = KeyPointClassifier(model_path='model/keypoint_classifier_jt/keypoint_classifier.tflite')
 
     point_history_classifier = PointHistoryClassifier()
 
     # ラベル読み込み ###########################################################
-    with open('model/keypoint_classifier/keypoint_classifier_label.csv',
+    with open('model/keypoint_classifier_jt/keypoint_classifier_label.csv',
               encoding='utf-8-sig') as f:
         keypoint_classifier_labels = csv.reader(f)
         keypoint_classifier_labels = [
@@ -147,6 +148,7 @@ def main():
                     point_history.append([0, 0])
 
                 # フィンガージェスチャー分類
+                # Finger gesture classification
                 finger_gesture_id = 0
                 point_history_len = len(pre_processed_point_history_list)
                 if point_history_len == (history_length * 2):
@@ -282,7 +284,7 @@ def logging_csv(number, mode, landmark_list, point_history_list):
     if mode == 0:
         pass
     if mode == 1 and (0 <= number <= 9):
-        csv_path = 'model/keypoint_classifier/keypoint.csv'
+        csv_path = 'model/keypoint_classifier_jt/keypoint.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *landmark_list])
